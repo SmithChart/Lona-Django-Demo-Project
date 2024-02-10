@@ -1,0 +1,6 @@
+.idea
+env/
+*.egg-info
+lona_project/static/
+__pycache__/
+lona_project/db.sqlite3

@@ -1,0 +1,74 @@
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- load all required CSS stylesheets -->
+        <link href="{{ Lona.load_static_file('style.css') }}" rel="stylesheet">
+        {{ Lona.load_stylesheets() }}
+    </head>
+    <body>
+        <!-- all views will be rendered in here -->
+        <main id="lona" style="height:100%;"></main>
+
+        <!-- load all required JavaScript files -->
+        {{ Lona.load_scripts() }}
+
+        <!-- setup Lona JavaScript client -->
+        <script>
+            window.addEventListener('load', () => {
+                const lona_context = new Lona.LonaContext({
+                    target: 'main#lona',
+                    title: 'Lona',
+                    update_address_bar: true,
+                    update_title: true,
+                    follow_redirects: true,
+                    follow_http_redirects: true,
+                });
+
+                // gets called when the websocket connection
+                // to the server was made
+                lona_context.add_connect_hook((lona_context) => {
+
+                    // patch navigation links so the page does not
+                    // reload but uses the websocket connection to start
+                    // new views
+                    lona_context.patch_input_events('nav#navigation');
+                });
+
+                // gets called when the server disconnects
+                lona_context.add_disconnect_hook((lona_context) => {
+                    document.querySelector('main#lona').innerHTML = `
+                        <h1>Server Disconnected</h1>
+                        <p>Trying to reconnect</p>
+                    `;
+
+                    // try to reconnect once a second
+                    setTimeout(() => {
+                        lona_context.reconnect();
+
+                    }, 1000);
+                });
+
+                // gets called when a view takes a long time to start
+                lona_context.add_view_timeout_hook((lona_context, lona_window) => {
+                    lona_window.set_html(`
+                        <h1>Waiting For Server</h1>
+                    `);
+                });
+
+                // gets called when the server takes a long time to respond
+                // to input events
+                lona_context.add_input_event_timeout_hook((lona_context, lona_window) => {
+                    alert('Waiting for server');
+                });
+
+                // setup
+                lona_context.setup();
+                window['lona_context'] = lona_context;
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,14 @@
+[Unit]
+Description=hostname.tld lona service
+
+[Service]
+User=www-data
+Type=simple
+WorkingDirectory=/var/www/hostname.tld/lona-project/
+ExecStart=/var/www/hostname.tld/lona-project/env/bin/lona run-server --host=localhost --port=8002 --project-root=lona_project -s settings.py --shell-server-url=file:///tmp/hostname.tld.socket
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
+

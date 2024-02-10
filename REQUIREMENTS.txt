@@ -1,0 +1,10 @@
+Django
+aiohttp_wsgi
+lona
+lona-django
+lona-bootstrap-5
+lona-picocss
+-e .
+requests
+bs4
+more_itertools
